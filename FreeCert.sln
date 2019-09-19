@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{947A94A4-7088-4D3C-9E99-72915DCF85F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeCert.ConsoleApp", "src\FreeCert.ConsoleApp\FreeCert.ConsoleApp.csproj", "{0183FC46-37B6-42D6-8852-77D4821D8DDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeCert.Core", "src\FreeCert.Core\FreeCert.Core.csproj", "{C89C1A7C-C013-4827-BD82-A603FE4D2025}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0183FC46-37B6-42D6-8852-77D4821D8DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0183FC46-37B6-42D6-8852-77D4821D8DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0183FC46-37B6-42D6-8852-77D4821D8DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0183FC46-37B6-42D6-8852-77D4821D8DDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C89C1A7C-C013-4827-BD82-A603FE4D2025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C89C1A7C-C013-4827-BD82-A603FE4D2025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C89C1A7C-C013-4827-BD82-A603FE4D2025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C89C1A7C-C013-4827-BD82-A603FE4D2025}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0183FC46-37B6-42D6-8852-77D4821D8DDB} = {947A94A4-7088-4D3C-9E99-72915DCF85F1}
+		{C89C1A7C-C013-4827-BD82-A603FE4D2025} = {947A94A4-7088-4D3C-9E99-72915DCF85F1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {051F3D65-D760-4832-8688-14D822CD1B2D}
+	EndGlobalSection
+EndGlobal
