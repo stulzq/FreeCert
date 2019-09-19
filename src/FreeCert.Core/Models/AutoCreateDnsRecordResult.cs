@@ -1,4 +1,4 @@
-﻿namespace FreeCert.Core.Exceptions
+﻿namespace FreeCert.Core.Models
 {
     public class AutoCreateDnsRecordResult
     {
