@@ -7,7 +7,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/stulzq/FreeCert.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>cert,pfx,acme,Let's Encrypt</PackageTags>
+    <PackageTags>cert,pfx,acme,letsencrypt</PackageTags>
     <Description>Fast and easy generation of HTTPS certificate library (Let's Encrypt ACME).</Description>
     <PackageProjectUrl>https://github.com/stulzq/FreeCert</PackageProjectUrl>
   </PropertyGroup>
