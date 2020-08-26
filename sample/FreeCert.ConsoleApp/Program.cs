@@ -12,11 +12,13 @@ namespace FreeCert.ConsoleApp
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
             var logger = loggerFactory.CreateLogger("xxx");
-            //            var builder=await new FreeCertBuilder(true,logger,true)
-            //                .AddNewAccount("stulzq@qq.com")
-            //                .SetDomain("xcmaster.com")
-            //                .SetDomain("*.xcmaster.com")
+            // Create 
+            //            var context=await new FreeCertBuilder(true,logger,true)
+            //                .AddNewAccount("<email>")
+            //                .SetDomain("<domain>")
             //                .BuildAsync();
+
+            // Update
             var context = await new FreeCertBuilder(true, logger, true)
                 .LoadAccount()
                 .LoadOrder()
@@ -29,7 +31,7 @@ namespace FreeCert.ConsoleApp
             Console.WriteLine($" AcceptTos: {account.AcceptTos}");
 
             Console.WriteLine();
-            await GetOrderInfo(context);
+            await GetOrderInfoAsync(context);
 
             Console.WriteLine();
             var authorizations = await context.GetAuthorizationsAsync();
@@ -55,25 +57,25 @@ namespace FreeCert.ConsoleApp
                 switch (input)
                 {
                     case "1":
-                        await GetDnsRecord(context);
+                        await GetDnsRecordAsync(context);
                         break;
                     case "2":
-                        await CheckDnsRecord(context);
+                        await CheckDnsRecordAsync(context);
                         break;
                     case "3":
-                        await Authorization(context);
+                        await AuthorizationAsync(context);
                         break;
                     case "4":
-                        await GetOrderInfo(context);
+                        await GetOrderInfoAsync(context);
                         break;
                     case "5":
-                        await AutoCreateDns(context);
+                        await AutoCreateDnsAsync(context);
                         break;
                     case "6":
-                        await Finish(context);
+                        await FinishAsync(context);
                         break;
                     case "7":
-                        await Export(context);
+                        await ExportAsync(context);
                         break;
                     default:
                         break;
@@ -84,19 +86,19 @@ namespace FreeCert.ConsoleApp
 
         }
 
-        static async Task Finish(FreeCertContext context)
+        static async Task FinishAsync(FreeCertContext context)
         {
             await context.OrderFinalizeAsync();
             Console.WriteLine("Finish Success!");
         }
 
-        static async Task Export(FreeCertContext context)
+        static async Task ExportAsync(FreeCertContext context)
         {
-            await context.ExportCertAsync();
+            await context.ExportCertAsync("123456");
             Console.WriteLine("Export Success!");
         }
 
-        static async Task AutoCreateDns(FreeCertContext context)
+        static async Task AutoCreateDnsAsync(FreeCertContext context)
         {
             var authResult = await context.AutoCreateDnsRecord(new TencentCloudDynamicDns(new TencentCloudOptions()
             {
@@ -109,7 +111,7 @@ namespace FreeCert.ConsoleApp
             Console.WriteLine($" Message : {authResult.ErrorMessage}");
         }
 
-        static async Task GetOrderInfo(FreeCertContext context)
+        static async Task GetOrderInfoAsync(FreeCertContext context)
         {
             var order = await context.GetOrderInfoAsync();
             Console.WriteLine("Current OrderInformation:");
@@ -118,7 +120,7 @@ namespace FreeCert.ConsoleApp
             Console.WriteLine($" Expires: {order.Expires:yyyy-MM-dd HH:mm:ss}");
         }
 
-        static async Task GetDnsRecord(FreeCertContext context)
+        static async Task GetDnsRecordAsync(FreeCertContext context)
         {
             var records = await context.GetDnsTxtRecordAsync();
             Console.WriteLine("Dns Record Information:");
@@ -128,14 +130,14 @@ namespace FreeCert.ConsoleApp
             }
         }
 
-        static async Task CheckDnsRecord(FreeCertContext context)
+        static async Task CheckDnsRecordAsync(FreeCertContext context)
         {
             var res = await context.CheckDnsTxtRecordAsync();
             Console.WriteLine("Dns Check Information:");
             Console.WriteLine(" Status:"+res);
         }
 
-        static async Task Authorization(FreeCertContext context)
+        static async Task AuthorizationAsync(FreeCertContext context)
         {
             await context.AuthorizationAsync();
             Console.WriteLine("AuthorizationComplete!");

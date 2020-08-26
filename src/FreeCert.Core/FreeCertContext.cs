@@ -6,10 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Certes;
 using Certes.Acme;
-using Certes.Acme.Resource;
 using Certes.Pkcs;
 using DynamicDns.Core;
-using FreeCert.Core.Exceptions;
 using FreeCert.Core.Models;
 
 namespace FreeCert.Core
@@ -149,28 +147,27 @@ namespace FreeCert.Core
 
             await OrderContext.Finalize(csrByte);
 
-            File.WriteAllText($"{AppConsts.WorkDir}/{topDomain}-{AppConsts.CertPemPrivateKeyName}", csrBuilder.Key.ToPem(),
+            File.WriteAllText($"{FreeCertConsts.WorkDir}/{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}", csrBuilder.Key.ToPem(),
                 Encoding.UTF8);
         }
 
-        public async Task ExportCertAsync()
+        public async Task ExportCertAsync(string password)
         {
             var topDomain = await GetTopDomainAsync();
 
             var cert = await OrderContext.Download();
             //pem证书
-            File.WriteAllText($"{AppConsts.WorkDir}/{topDomain}-{AppConsts.CertPemName}", cert.ToPem(),
+            File.WriteAllText($"{FreeCertConsts.WorkDir}/{topDomain}-{FreeCertConsts.CertPemName}", cert.ToPem(),
                 Encoding.UTF8);
 
-            var privateKey= File.ReadAllText($"{AppConsts.WorkDir}/{topDomain}-{AppConsts.CertPemPrivateKeyName}",
+            var privateKey= File.ReadAllText($"{FreeCertConsts.WorkDir}/{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}",
                 Encoding.UTF8);
-            var pfxPass = "123456";
 
             //pfx证书
             var pfxBuilder = cert.ToPfx(KeyFactory.FromPem(privateKey));
-            var pfx = pfxBuilder.Build(topDomain, pfxPass);
-            File.WriteAllBytes($"{AppConsts.WorkDir}/{topDomain}{AppConsts.CertPfxName}",pfx);
-            File.WriteAllText($"{AppConsts.WorkDir}/{topDomain}{AppConsts.CertPfxPasswordName}",pfxPass);
+            var pfx = pfxBuilder.Build(topDomain, password);
+            File.WriteAllBytes($"{FreeCertConsts.WorkDir}/{topDomain}{FreeCertConsts.CertPfxName}",pfx);
+            File.WriteAllText($"{FreeCertConsts.WorkDir}/{topDomain}{FreeCertConsts.CertPfxPasswordName}", password);
         }
 
 

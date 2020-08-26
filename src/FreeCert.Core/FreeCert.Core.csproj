@@ -2,13 +2,28 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>stulzq(Zhiqiang Li)</Authors>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/stulzq/FreeCert.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>cert,pfx,acme,Let's Encrypt</PackageTags>
+    <Description>Fast and easy generation of HTTPS certificate library (Let's Encrypt ACME).</Description>
+    <PackageProjectUrl>https://github.com/stulzq/FreeCert</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Certes" Version="2.3.3" />
+    <PackageReference Include="Certes" Version="2.3.4" />
     <PackageReference Include="DynamicDns.TencentCloud" Version="1.0.1" />
     <PackageReference Include="Makaretu.Dns.Unicast" Version="0.11.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

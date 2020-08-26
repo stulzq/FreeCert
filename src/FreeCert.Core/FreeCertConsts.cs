@@ -1,6 +1,6 @@
 ﻿namespace FreeCert.Core
 {
-    public class AppConsts
+    public class FreeCertConsts
     {
         public const string WorkDir = "FreeCert";
         public const string AccountKeyName = "Account.key";

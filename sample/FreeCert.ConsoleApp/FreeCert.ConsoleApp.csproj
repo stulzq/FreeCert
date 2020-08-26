@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FreeCert.Core\FreeCert.Core.csproj" />
+    <ProjectReference Include="..\..\src\FreeCert.Core\FreeCert.Core.csproj" />
   </ItemGroup>
 
 </Project>

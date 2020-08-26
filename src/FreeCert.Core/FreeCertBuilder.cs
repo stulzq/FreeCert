@@ -15,8 +15,8 @@ namespace FreeCert.Core
     {
         private readonly ILogger _logger;
         private readonly bool _debug;
-        private List<string> _accounts=new List<string>();
-        private List<string> _domains=new List<string>();
+        private readonly List<string> _accounts=new List<string>();
+        private readonly List<string> _domains=new List<string>();
         private string _accountKey;
         private Uri _orderUri;
 
@@ -30,15 +30,15 @@ namespace FreeCert.Core
         {
             if (!acceptTos)
             {
-                throw new FreeCertCoreException("As you do not accept the Let's Encrypt terms of service, will not be able to continue working.");
+                throw new FreeCertException("As you do not accept the Let's Encrypt terms of service, will not be able to continue working.");
             }
 
             _logger = logger;
             _debug = debug;
 
-            if (!Directory.Exists(AppConsts.WorkDir))
+            if (!Directory.Exists(FreeCertConsts.WorkDir))
             {
-                Directory.CreateDirectory(AppConsts.WorkDir);
+                Directory.CreateDirectory(FreeCertConsts.WorkDir);
             }
         }
 
@@ -77,10 +77,10 @@ namespace FreeCert.Core
         /// <returns></returns>
         public FreeCertBuilder LoadAccount()
         {
-            var path = $"{AppConsts.WorkDir}/{AppConsts.AccountKeyName}";
+            var path = $"{FreeCertConsts.WorkDir}/{FreeCertConsts.AccountKeyName}";
             if (!File.Exists(path))
             {
-                throw new FreeCertCoreException($"Can not load account, key file not found in path {path}.");
+                throw new FreeCertException($"Can not load account, key file not found in path {path}.");
             }
             _accountKey = File.ReadAllText(path,Encoding.UTF8);
             return this;
@@ -92,7 +92,7 @@ namespace FreeCert.Core
         /// <returns></returns>
         public FreeCertBuilder LoadOrder()
         {
-            var str = File.ReadAllText($"{AppConsts.WorkDir}/{AppConsts.OrderUriName}", Encoding.UTF8);
+            var str = File.ReadAllText($"{FreeCertConsts.WorkDir}/{FreeCertConsts.OrderUriName}", Encoding.UTF8);
             _orderUri = new Uri(str);
             return this;
         }
@@ -134,14 +134,14 @@ namespace FreeCert.Core
 
                 if (_domains.Count == 0)
                 {
-                    throw new FreeCertCoreException("No domain is available.");
+                    throw new FreeCertException("No domain is available.");
                 }
 
                 acmeContext = new AcmeContext(acmeServer);
                 
                 if (_accounts.Count == 0)
                 {
-                    throw new FreeCertCoreException("No email address is available and no account can be created.");
+                    throw new FreeCertException("No email address is available and no account can be created.");
                 }
                 else if(_accounts.Count==1)
                 {
@@ -155,7 +155,7 @@ namespace FreeCert.Core
                 _logger.LogInformation("Account created.");
 
                 //存储新创建用户AccountKey
-                var path = $"{AppConsts.WorkDir}/{AppConsts.AccountKeyName}";
+                var path = $"{FreeCertConsts.WorkDir}/{FreeCertConsts.AccountKeyName}";
                 File.WriteAllText(path,acmeContext.AccountKey.ToPem(),Encoding.UTF8);
                 _logger.LogInformation("Account stored.");
 
@@ -184,7 +184,7 @@ namespace FreeCert.Core
             }
 
 
-            File.WriteAllText($"{AppConsts.WorkDir}/{AppConsts.OrderUriName}", order.Location.ToString(), Encoding.UTF8);
+            File.WriteAllText($"{FreeCertConsts.WorkDir}/{FreeCertConsts.OrderUriName}", order.Location.ToString(), Encoding.UTF8);
             _logger.LogInformation("Order stored.");
 
             return new FreeCertContext(acmeContext,account,order);
