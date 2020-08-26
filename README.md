@@ -1,2 +1,2 @@
 # FreeCert
-Free HTTPS Certificate（Let's Encrypt）.
+Fast and easy generation of HTTPS certificate library (Let's Encrypt ACME).
