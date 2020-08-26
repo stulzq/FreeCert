@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using DynamicDns.TencentCloud;
 using FreeCert.Core;
@@ -13,16 +14,16 @@ namespace FreeCert.ConsoleApp
             ILoggerFactory loggerFactory = new LoggerFactory();
             var logger = loggerFactory.CreateLogger("xxx");
             // Create 
-            //            var context=await new FreeCertBuilder(true,logger,true)
-            //                .AddNewAccount("<email>")
-            //                .SetDomain("<domain>")
-            //                .BuildAsync();
+            var context=await new FreeCertBuilder(true,Directory.GetCurrentDirectory(),logger,true)
+                .AddNewAccount("<email>")
+                .SetDomain("<domain>")
+                .BuildAsync();
 
             // Update
-            var context = await new FreeCertBuilder(true, logger, true)
-                .LoadAccount()
-                .LoadOrder()
-                .BuildAsync();
+            // var context = await new FreeCertBuilder(true, logger, true)
+            //     .LoadAccount()
+            //     .LoadOrder()
+            //     .BuildAsync();
 
             var account = await context.GetAccountAsync();
             Console.WriteLine("AccountInformation:");

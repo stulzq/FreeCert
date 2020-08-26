@@ -14,6 +14,7 @@ namespace FreeCert.Core
 {
     public class FreeCertContext
     {
+        private readonly string _workDir;
         public IAcmeContext AcmeContext { get; }
         public IOrderContext OrderContext { get; }
         public IAccountContext AccountContext { get; }
@@ -24,8 +25,10 @@ namespace FreeCert.Core
         /// <param name="acmeContext"></param>
         /// <param name="accountContext"></param>
         /// <param name="orderContext"></param>
-        public FreeCertContext(IAcmeContext acmeContext,IAccountContext accountContext, IOrderContext orderContext)
+        /// <param name="workDir"></param>
+        public FreeCertContext(IAcmeContext acmeContext,IAccountContext accountContext, IOrderContext orderContext,string workDir)
         {
+            _workDir = workDir;
             AcmeContext = acmeContext;
             AccountContext = accountContext;
             OrderContext = orderContext;
@@ -147,7 +150,7 @@ namespace FreeCert.Core
 
             await OrderContext.Finalize(csrByte);
 
-            File.WriteAllText($"{FreeCertConsts.WorkDir}/{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}", csrBuilder.Key.ToPem(),
+            File.WriteAllText(Path.Combine(_workDir,$"{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}"), csrBuilder.Key.ToPem(),
                 Encoding.UTF8);
         }
 
@@ -157,17 +160,17 @@ namespace FreeCert.Core
 
             var cert = await OrderContext.Download();
             //pem证书
-            File.WriteAllText($"{FreeCertConsts.WorkDir}/{topDomain}-{FreeCertConsts.CertPemName}", cert.ToPem(),
+            File.WriteAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPemName}"), cert.ToPem(),
                 Encoding.UTF8);
 
-            var privateKey= File.ReadAllText($"{FreeCertConsts.WorkDir}/{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}",
+            var privateKey= File.ReadAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}"),
                 Encoding.UTF8);
 
             //pfx证书
             var pfxBuilder = cert.ToPfx(KeyFactory.FromPem(privateKey));
             var pfx = pfxBuilder.Build(topDomain, password);
-            File.WriteAllBytes($"{FreeCertConsts.WorkDir}/{topDomain}{FreeCertConsts.CertPfxName}",pfx);
-            File.WriteAllText($"{FreeCertConsts.WorkDir}/{topDomain}{FreeCertConsts.CertPfxPasswordName}", password);
+            File.WriteAllBytes(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPfxName}"), pfx);
+            File.WriteAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPfxPasswordName}"), password);
         }
 
 

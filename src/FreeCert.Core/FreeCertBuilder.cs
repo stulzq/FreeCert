@@ -13,6 +13,7 @@ namespace FreeCert.Core
 {
     public class FreeCertBuilder
     {
+        private readonly string _workDir;
         private readonly ILogger _logger;
         private readonly bool _debug;
         private readonly List<string> _accounts=new List<string>();
@@ -24,21 +25,23 @@ namespace FreeCert.Core
         /// 
         /// </summary>
         /// <param name="acceptTos">Let's Encrypt Terms of Service. https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf </param>
+        /// <param name="workDir"></param>
         /// <param name="logger"></param>
         /// <param name="debug">When true will use Let's Encrypt staging environment, which may result in rate constraints if used directly in a production environment</param>
-        public FreeCertBuilder(bool acceptTos,ILogger logger, bool debug = false)
+        public FreeCertBuilder(bool acceptTos,string workDir,ILogger logger, bool debug = false)
         {
             if (!acceptTos)
             {
                 throw new FreeCertException("As you do not accept the Let's Encrypt terms of service, will not be able to continue working.");
             }
 
+            _workDir = workDir;
             _logger = logger;
             _debug = debug;
 
-            if (!Directory.Exists(FreeCertConsts.WorkDir))
+            if (!Directory.Exists(_workDir))
             {
-                Directory.CreateDirectory(FreeCertConsts.WorkDir);
+                Directory.CreateDirectory(_workDir);
             }
         }
 
@@ -69,20 +72,13 @@ namespace FreeCert.Core
             return this;
         }
 
-
-
         /// <summary>
         /// Load exists account.
         /// </summary>
         /// <returns></returns>
-        public FreeCertBuilder LoadAccount()
+        public FreeCertBuilder LoadAccount(string accountKey)
         {
-            var path = $"{FreeCertConsts.WorkDir}/{FreeCertConsts.AccountKeyName}";
-            if (!File.Exists(path))
-            {
-                throw new FreeCertException($"Can not load account, key file not found in path {path}.");
-            }
-            _accountKey = File.ReadAllText(path,Encoding.UTF8);
+            _accountKey = accountKey;
             return this;
         }
 
@@ -90,10 +86,9 @@ namespace FreeCert.Core
         /// Load exists order.
         /// </summary>
         /// <returns></returns>
-        public FreeCertBuilder LoadOrder()
+        public FreeCertBuilder LoadOrder(Uri orderUri)
         {
-            var str = File.ReadAllText($"{FreeCertConsts.WorkDir}/{FreeCertConsts.OrderUriName}", Encoding.UTF8);
-            _orderUri = new Uri(str);
+            _orderUri = orderUri;
             return this;
         }
 
@@ -117,6 +112,21 @@ namespace FreeCert.Core
         {
             _domains.AddRange(domains);
             return this;
+        }
+
+        public string GetAccountKey()
+        {
+            return _accountKey;
+        }
+
+        public Uri GetOrderUri()
+        {
+            return _orderUri;
+        }
+
+        public string GetWorkDir()
+        {
+            return _workDir;
         }
 
         public async Task<FreeCertContext> BuildAsync()
@@ -155,9 +165,7 @@ namespace FreeCert.Core
                 _logger.LogInformation("Account created.");
 
                 //存储新创建用户AccountKey
-                var path = $"{FreeCertConsts.WorkDir}/{FreeCertConsts.AccountKeyName}";
-                File.WriteAllText(path,acmeContext.AccountKey.ToPem(),Encoding.UTF8);
-                _logger.LogInformation("Account stored.");
+                _accountKey = acmeContext.AccountKey.ToPem();
 
                 //创建新订单
                 order = await acmeContext.NewOrder(_domains);
@@ -183,11 +191,9 @@ namespace FreeCert.Core
                 }
             }
 
+            _orderUri = order.Location;
 
-            File.WriteAllText($"{FreeCertConsts.WorkDir}/{FreeCertConsts.OrderUriName}", order.Location.ToString(), Encoding.UTF8);
-            _logger.LogInformation("Order stored.");
-
-            return new FreeCertContext(acmeContext,account,order);
+            return new FreeCertContext(acmeContext,account,order, _workDir);
         }
     }
 }
