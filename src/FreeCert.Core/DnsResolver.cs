@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Makaretu.Dns;
 using Microsoft.Extensions.Logging;
@@ -23,7 +24,7 @@ namespace FreeCert.Core
         /// <returns></returns>
         public async Task<List<string>> QueryTxtRecord(string domain)
         {
-            var dns = new DnsClient();
+            var dns = new DnsClient(){Servers = new[]{IPAddress.Parse("8.8.8.8"),IPAddress.Parse("114.114.114.114")}};
             try
             {
 
