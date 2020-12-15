@@ -10,9 +10,9 @@ namespace FreeCert.ConsoleApp
 {
     class Program
     {
-
-        static string tcloudSecretId = "AKIDxmU5YugMQsBID6eQr7CC1d74uX6xiDbn";
-        static string tcloudSecretKey = "CFAsTsI8EE9wX6WvJwRnhS0RgnibJoBL";
+        //Tencent Cloud API Key 
+        static string tcloudSecretId = "<id>";
+        static string tcloudSecretKey = "<key>";
 
         static string workDir = Directory.GetCurrentDirectory();
         static string accountKeyFile = Path.Combine(Directory.GetCurrentDirectory(), "account.key");

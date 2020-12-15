@@ -10,6 +10,8 @@
     <PackageTags>cert,pfx,acme,letsencrypt</PackageTags>
     <Description>Fast and easy generation of HTTPS certificate library (Let's Encrypt ACME).</Description>
     <PackageProjectUrl>https://github.com/stulzq/FreeCert</PackageProjectUrl>
+    <PackageReleaseNotes>fix bug</PackageReleaseNotes>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
