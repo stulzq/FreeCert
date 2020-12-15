@@ -9,12 +9,15 @@ using Certes.Acme;
 using Certes.Pkcs;
 using DynamicDns.Core;
 using FreeCert.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FreeCert.Core
 {
     public class FreeCertContext
     {
         private readonly string _workDir;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly DnsResolver _dnsResolver;
         public IAcmeContext AcmeContext { get; }
         public IOrderContext OrderContext { get; }
         public IAccountContext AccountContext { get; }
@@ -26,12 +29,14 @@ namespace FreeCert.Core
         /// <param name="accountContext"></param>
         /// <param name="orderContext"></param>
         /// <param name="workDir"></param>
-        public FreeCertContext(IAcmeContext acmeContext,IAccountContext accountContext, IOrderContext orderContext,string workDir)
+        public FreeCertContext(IAcmeContext acmeContext, IAccountContext accountContext, IOrderContext orderContext, string workDir, ILoggerFactory loggerFactory)
         {
             _workDir = workDir;
+            _loggerFactory = loggerFactory;
             AcmeContext = acmeContext;
             AccountContext = accountContext;
             OrderContext = orderContext;
+            _dnsResolver = new DnsResolver(_loggerFactory.CreateLogger<DnsResolver>());
         }
 
         public async Task<AcmeOrderInfo> GetOrderInfoAsync()
@@ -49,11 +54,11 @@ namespace FreeCert.Core
         public async Task<AcmeAccountInfo> GetAccountAsync()
         {
             var account = await AccountContext.Resource();
-            
+
             var accountInfo = new AcmeAccountInfo
             {
                 Status = account.Status.ToString(),
-                Contacts = account.Contact.Select(a=>a).ToList(),
+                Contacts = account.Contact.Select(a => a).ToList(),
                 AcceptTos = account.TermsOfServiceAgreed,
             };
             return accountInfo;
@@ -61,7 +66,7 @@ namespace FreeCert.Core
 
         public async Task<List<AcmeDnsAuthorizationInfo>> GetAuthorizationsAsync()
         {
-            var result=new List<AcmeDnsAuthorizationInfo>();
+            var result = new List<AcmeDnsAuthorizationInfo>();
             foreach (var authorization in await OrderContext.Authorizations())
             {
                 var challengeContext = await authorization.Dns();
@@ -69,7 +74,7 @@ namespace FreeCert.Core
 
                 var challenge = await challengeContext.Resource();
                 var domain = await GetTopDomainAsync();
-                var authInfo=new AcmeDnsAuthorizationInfo()
+                var authInfo = new AcmeDnsAuthorizationInfo()
                 {
                     Record = $"{_challengeSubDomain}.{domain}",
                     RecordType = "TXT",
@@ -96,7 +101,7 @@ namespace FreeCert.Core
                 var opRes = await ddns.AddAsync(domain, _challengeSubDomain, "TXT", item.Value);
                 if (opRes.Error)
                 {
-                    return new AutoCreateDnsRecordResult(false,opRes.Message);
+                    return new AutoCreateDnsRecordResult(false, opRes.Message);
                 }
             }
 
@@ -106,7 +111,7 @@ namespace FreeCert.Core
         public async Task<List<string>> GetDnsTxtRecordAsync()
         {
             var domain = await GetTopDomainAsync();
-            var records = await new DnsResolver().QueryTxtRecord($"{_challengeSubDomain}.{domain}");
+            var records = await _dnsResolver.QueryTxtRecord($"{_challengeSubDomain}.{domain}");
             return records;
         }
 
@@ -150,7 +155,7 @@ namespace FreeCert.Core
 
             await OrderContext.Finalize(csrByte);
 
-            File.WriteAllText(Path.Combine(_workDir,$"{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}"), csrBuilder.Key.ToPem(),
+            File.WriteAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}"), csrBuilder.Key.ToPem(),
                 Encoding.UTF8);
         }
 
@@ -163,7 +168,7 @@ namespace FreeCert.Core
             File.WriteAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPemName}"), cert.ToPem(),
                 Encoding.UTF8);
 
-            var privateKey= File.ReadAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}"),
+            var privateKey = File.ReadAllText(Path.Combine(_workDir, $"{topDomain}-{FreeCertConsts.CertPemPrivateKeyName}"),
                 Encoding.UTF8);
 
             //pfx证书

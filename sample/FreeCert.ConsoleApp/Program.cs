@@ -9,27 +9,43 @@ namespace FreeCert.ConsoleApp
 {
     class Program
     {
-        static async Task Main(string[] args)
-        {
-            ILoggerFactory loggerFactory = new LoggerFactory();
-            var logger = loggerFactory.CreateLogger("xxx");
-            // Create 
-            var context=await new FreeCertBuilder(true,Directory.GetCurrentDirectory(),logger,true)
-                .AddNewAccount("<email>")
-                .SetDomain("<domain>")
-                .BuildAsync();
 
-            // Update
-            // var context = await new FreeCertBuilder(true, logger, true)
-            //     .LoadAccount()
-            //     .LoadOrder()
-            //     .BuildAsync();
+        static string tcloudSecretId = "";
+        static string tcloudSecretKey = "";
+
+        static string workDir = Directory.GetCurrentDirectory();
+        static string accountKeyFile = Path.Combine(Directory.GetCurrentDirectory(), "account.key");
+        static string orderUriFile = Path.Combine(Directory.GetCurrentDirectory(), "order.uri");
+        private static string email = "<email>";
+        private static string domain = "<domain>";
+
+        static async Task Main()
+        {
+            var loggerFactory = new LoggerFactory();
+            // Create 
+            FreeCertContext context;
+            if (File.Exists(accountKeyFile) && File.Exists(orderUriFile))
+            {
+                context = await new FreeCertBuilder(true, workDir, loggerFactory, true)
+                    .LoadAccount(File.ReadAllText(accountKeyFile))
+                    .LoadOrder(new Uri(File.ReadAllText(orderUriFile)))
+                    .BuildAsync();
+            }
+            else
+            {
+                context = await new FreeCertBuilder(true, workDir, loggerFactory, true)
+                    .AddNewAccount(email)
+                    .SetDomain(domain)
+                    .BuildAsync();
+            }
 
             var account = await context.GetAccountAsync();
             Console.WriteLine("AccountInformation:");
             Console.WriteLine($" Status   : {account.Status}");
             Console.WriteLine($" Contacts : {string.Join(",", account.Contacts)}");
             Console.WriteLine($" AcceptTos: {account.AcceptTos}");
+            await File.WriteAllTextAsync(accountKeyFile, context.AcmeContext.AccountKey.ToPem());
+            Console.WriteLine($" Account Key saved at {accountKeyFile}.");
 
             Console.WriteLine();
             await GetOrderInfoAsync(context);
@@ -51,34 +67,32 @@ namespace FreeCert.ConsoleApp
             do
             {
                 Console.WriteLine();
-                Console.WriteLine("Menu: 1.GetDnsRecord 2.CheckDnsRecord 3.Authorization 4.GetOrderInfo 5.AutoCreateDnsRecord 6.Finish 7.Export ");
+                Console.WriteLine("Menu: 1.AutoCreateDnsRecord 2.GetDnsRecord 3.CheckDnsRecord 4.Authorization 5.GetOrderInfo 6.Finish 7.Export ");
                 Console.WriteLine("Enter 'e' to exit ");
                 input = Console.ReadLine();
 
                 switch (input)
                 {
                     case "1":
-                        await GetDnsRecordAsync(context);
+                        await AutoCreateDnsAsync(context);
                         break;
                     case "2":
-                        await CheckDnsRecordAsync(context);
+                        await GetDnsRecordAsync(context);
                         break;
                     case "3":
-                        await AuthorizationAsync(context);
+                        await CheckDnsRecordAsync(context);
                         break;
                     case "4":
-                        await GetOrderInfoAsync(context);
+                        await AuthorizationAsync(context);
                         break;
                     case "5":
-                        await AutoCreateDnsAsync(context);
+                        await GetOrderInfoAsync(context);
                         break;
                     case "6":
                         await FinishAsync(context);
                         break;
                     case "7":
                         await ExportAsync(context);
-                        break;
-                    default:
                         break;
                 }
 
@@ -103,8 +117,8 @@ namespace FreeCert.ConsoleApp
         {
             var authResult = await context.AutoCreateDnsRecord(new TencentCloudDynamicDns(new TencentCloudOptions()
             {
-                SecretId = Environment.GetEnvironmentVariable("TENCENT_CLOUD_SECRETID", EnvironmentVariableTarget.User),
-                SecretKey = Environment.GetEnvironmentVariable("TENCENT_CLOUD_SECRETKEY", EnvironmentVariableTarget.User)
+                SecretId = tcloudSecretId,
+                SecretKey = tcloudSecretKey
             }));
             Console.WriteLine();
             Console.WriteLine("Auto CreateDns Result:");
@@ -115,10 +129,14 @@ namespace FreeCert.ConsoleApp
         static async Task GetOrderInfoAsync(FreeCertContext context)
         {
             var order = await context.GetOrderInfoAsync();
+
             Console.WriteLine("Current OrderInformation:");
             Console.WriteLine($" Status : {order.Status}");
             Console.WriteLine($" Domains: {string.Join(",", order.Domains)}");
             Console.WriteLine($" Expires: {order.Expires:yyyy-MM-dd HH:mm:ss}");
+
+            await File.WriteAllTextAsync(orderUriFile, context.OrderContext.Location.ToString());
+            Console.WriteLine($" Order Uri saved at {orderUriFile}.");
         }
 
         static async Task GetDnsRecordAsync(FreeCertContext context)
@@ -135,7 +153,7 @@ namespace FreeCert.ConsoleApp
         {
             var res = await context.CheckDnsTxtRecordAsync();
             Console.WriteLine("Dns Check Information:");
-            Console.WriteLine(" Status:"+res);
+            Console.WriteLine(" Status:" + res);
         }
 
         static async Task AuthorizationAsync(FreeCertContext context)

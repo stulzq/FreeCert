@@ -14,6 +14,7 @@ namespace FreeCert.Core
     public class FreeCertBuilder
     {
         private readonly string _workDir;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly bool _debug;
         private readonly List<string> _accounts=new List<string>();
@@ -26,9 +27,9 @@ namespace FreeCert.Core
         /// </summary>
         /// <param name="acceptTos">Let's Encrypt Terms of Service. https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf </param>
         /// <param name="workDir"></param>
-        /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="debug">When true will use Let's Encrypt staging environment, which may result in rate constraints if used directly in a production environment</param>
-        public FreeCertBuilder(bool acceptTos,string workDir,ILogger logger, bool debug = false)
+        public FreeCertBuilder(bool acceptTos,string workDir,ILoggerFactory loggerFactory, bool debug = false)
         {
             if (!acceptTos)
             {
@@ -36,7 +37,8 @@ namespace FreeCert.Core
             }
 
             _workDir = workDir;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<FreeCertBuilder>();
             _debug = debug;
 
             if (!Directory.Exists(_workDir))
@@ -193,7 +195,7 @@ namespace FreeCert.Core
 
             _orderUri = order.Location;
 
-            return new FreeCertContext(acmeContext,account,order, _workDir);
+            return new FreeCertContext(acmeContext,account,order, _workDir,_loggerFactory);
         }
     }
 }
