@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DynamicDns.TencentCloud;
 using FreeCert.Core;
@@ -143,9 +144,17 @@ namespace FreeCert.ConsoleApp
         {
             var records = await context.GetDnsTxtRecordAsync();
             Console.WriteLine("Dns Record Information:");
-            foreach (var record in records)
+
+            if (records.Any())
             {
-                Console.WriteLine(" " + record);
+                foreach (var record in records)
+                {
+                    Console.WriteLine(" " + record);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No record.");
             }
         }
 
