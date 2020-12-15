@@ -29,6 +29,7 @@ namespace FreeCert.Core
         /// <param name="accountContext"></param>
         /// <param name="orderContext"></param>
         /// <param name="workDir"></param>
+        /// <param name="loggerFactory"></param>
         public FreeCertContext(IAcmeContext acmeContext, IAccountContext accountContext, IOrderContext orderContext, string workDir, ILoggerFactory loggerFactory)
         {
             _workDir = workDir;

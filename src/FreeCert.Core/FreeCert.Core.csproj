@@ -16,7 +16,7 @@
     <PackageReference Include="Certes" Version="2.3.4" />
     <PackageReference Include="DynamicDns.TencentCloud" Version="1.0.1" />
     <PackageReference Include="Makaretu.Dns.Unicast" Version="0.11.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,14 +11,14 @@ namespace FreeCert.ConsoleApp
     class Program
     {
 
-        static string tcloudSecretId = "";
-        static string tcloudSecretKey = "";
+        static string tcloudSecretId = "AKIDxmU5YugMQsBID6eQr7CC1d74uX6xiDbn";
+        static string tcloudSecretKey = "CFAsTsI8EE9wX6WvJwRnhS0RgnibJoBL";
 
         static string workDir = Directory.GetCurrentDirectory();
         static string accountKeyFile = Path.Combine(Directory.GetCurrentDirectory(), "account.key");
         static string orderUriFile = Path.Combine(Directory.GetCurrentDirectory(), "order.uri");
-        private static string email = "<email>";
-        private static string domain = "<domain>";
+        private static string email = "644928779@qq.com";
+        private static string domain = "cyanstream.com";
 
         static async Task Main()
         {
